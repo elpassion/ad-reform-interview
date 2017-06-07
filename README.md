@@ -1,24 +1,11 @@
-# README
+# AD REFORM GENDER CLASSIFIER
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### INSTALLING
 
-Things you may want to cover:
+```
+git clone git@github.com:elpassion/ad-reform-interview.git && cd ad-reform-interview && bundle && rails db:migrate && echo "Ad Reform Gender Classifier is ready to work :)"
+```
 
-* Ruby version
+### TESTING
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+`bundle exec rspec`
