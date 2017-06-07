@@ -46,12 +46,35 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
     it { expect(subject.call).to eql({ 'f' => 2, 'm' => 1 }) }
   end
 
+  describe '#classes_with_features' do
+    subject { -> { described_class.new(*args).send(:classes_with_features_mean) } }
+    before do
+      Person.create([
+                      female(height: 80, weight: 55),
+                      female(height: 70, weight: 50),
+                      male(height: 100, weight: 70),
+                      male(height: 80, weight: 73),
+                      male(height: 80, weight: 72),
+                    ])
+    end
+    let(:args) { valid_args }
+
+    it do
+      expected = {
+        'f' => { 'height' => 75.0, 'weight' => 52.5 },
+        'm' => { 'height' => 86.67, 'weight' => 71.67
+        }
+      }
+      expect(subject.call).to eql(expected)
+    end
+  end
+
   describe '#classes_with_mean' do
     subject { -> { described_class.new(*args).send(:classes_with_mean) } }
     before { Person.create([female, female, male]) }
     let(:args) { valid_args }
 
-    it { expect(subject.call).to eql({ 'f' => 0.67, 'm' => 0.33}) }
+    it { expect(subject.call).to eql({ 'f' => 0.67, 'm' => 0.33 }) }
   end
 
   def female(height: 88, weight: 55)
