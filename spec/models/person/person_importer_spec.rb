@@ -25,10 +25,10 @@ describe Person::PersonImporter do
       expect(first_person.height).to eql(70)
       expect(first_person.weight).to eql(81)
 
-      second_person = Person.last
-      expect(second_person.gender).to eql('m')
-      expect(second_person.height).to eql(61)
-      expect(second_person.weight).to eql(85)
+      last_person = Person.last
+      expect(last_person.gender).to eql('m')
+      expect(last_person.height).to eql(61)
+      expect(last_person.weight).to eql(85)
     end
   end
 end
