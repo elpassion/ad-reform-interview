@@ -1,4 +1,4 @@
-require_relative '../../../services/classifiers'
+require 'rails_helper'
 
 describe Classifiers::GenderClassifier do
   describe '.call' do
@@ -22,6 +22,12 @@ describe Classifiers::GenderClassifier do
     context 'with non-integer :weight' do
       let(:args) { [height: 100, weight: 'string'] }
       it { expect(subject).to raise_error(TypeError, 'weight must be Integer') }
+    end
+
+    context 'with valid arguments' do
+      let(:args) { [height: 100, weight: 80] }
+
+      it { expect(subject).to_not raise_error }
     end
   end
 end

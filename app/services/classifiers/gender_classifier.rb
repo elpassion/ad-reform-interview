@@ -11,11 +11,13 @@ module Classifiers
     end
 
     def call
-      NaiveBayesClassifier.call(
+      strategy = Classifiers::NaiveBayesClassifier::ActiveRecordStorage.new(
         ar_model:     Person,
         class_column: :gender,
         features:     %i[height weight]
       )
+
+      Classifiers::NaiveBayesClassifier.new.with_strategy(strategy).call
     end
 
     private
