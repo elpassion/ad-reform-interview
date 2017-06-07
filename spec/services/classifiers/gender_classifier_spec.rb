@@ -1,6 +1,6 @@
-require_relative '../../../app/services/classifiers/gender_classifier'
+require_relative '../../../services/classifiers'
 
-describe GenderClassifier do
+describe Classifiers::GenderClassifier do
   describe '.call' do
     subject { -> { described_class.call(*args) } }
 
