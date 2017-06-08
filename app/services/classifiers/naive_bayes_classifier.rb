@@ -3,20 +3,31 @@ module Classifiers
     #TODO: add array_storage
     require_relative 'naive_bayes_classifier/active_record_storage'
 
-    def call(*args)
-      raise(StrategyNotSet) unless @strategy
-      @strategy.call(*args)
-    end
+    ACTIVE_RECORD_STORAGE_OPTIONS = [
+      :ar_model,
+      :class_column,
+      :features
+    ].freeze; private_constant :ACTIVE_RECORD_STORAGE_OPTIONS
 
-    def with_strategy(strategy)
-      @strategy = strategy
-      self
+    class << self
+      def call(opts)
+        strategy(opts).call
+      end
+
+      def strategy(opts)
+        keys = opts.keys
+        if (ACTIVE_RECORD_STORAGE_OPTIONS & keys).size == ACTIVE_RECORD_STORAGE_OPTIONS.size
+          Classifiers::NaiveBayesClassifier::ActiveRecordStorage.new(opts)
+        else
+          raise StrategyNotFound.new(keys)
+        end
+      end
     end
   end
 
-  class StrategyNotSet < StandardError
-    def initialize
-      super('Please set strategy with #with_strategy')
+  class StrategyNotFound < StandardError
+    def initialize(opts_keys)
+      super("Could not find strategy for following options: #{opts_keys}")
     end
   end
 end
