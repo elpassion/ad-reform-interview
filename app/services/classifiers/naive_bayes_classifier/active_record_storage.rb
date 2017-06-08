@@ -15,55 +15,48 @@ module Classifiers
 
       attr_reader :ar_model, :class_column, :features
 
-      def classes
-        @classes ||=
-          ar_model.select(class_column).distinct.pluck(class_column)
-      end
-
-      def classes_with_count
-        @classes_with_count ||=
-          ar_model.group(class_column).count
-      end
-
-      # Returns Hash structured as follows:
+      # Returns averages and variances grouped by classes as a following structure:
       # {
-      #   'class1' => { 'feature1' => feature1_mean_in_class_1, 'feature2' => feature2_mean_in_class_1 },
-      #   'class2' => { 'feature1' => feature1_mean_in_class_2, 'feature2' => feature2_mean_in_class_2 }
+      #   'm' => {
+      #     'height_avg' => 86.67,
+      #     'height_var' => 133.33,
+      #   },
+      #   'f' => {
+      #     'height_avg' => 75.0,
+      #     'height_var' => 50.0,
+      #   }
       # }
-      def classes_with_features_mean
-        classes_with_features_mean = {}
-
-        classes.each do |klass|
-          classes_with_features_mean[klass] = {}
-
-          # AVG(height) AS height_avg, AVG(weight) AS weight_avg
-          select_sql = features.map do |feature|
-            "AVG(`#{feature}`) AS #{feature}_avg"
-          end.join(', ')
-
-          # Get all averages with one query
-          averages = ar_model.where(class_column => klass).select(select_sql).first
-
-          features.each do |feature|
-            average = averages["#{feature}_avg"].to_f.round(2)
-            classes_with_features_mean[klass][feature] = average
+      def averages_and_variances_grouped_by_classes
+        {}.tap do |hash|
+          results_grouped_by_classes = ar_model.select(select_sql).group(class_column)
+          results_grouped_by_classes.each do |result|
+            klass       = result[class_column]
+            hash[klass] = {}
+            features.each do |feature|
+              feature_average               = result["#{feature}_avg"]
+              feature_variance              = result["#{feature}_var"]
+              feature_average               = feature_average.to_f.round(2)
+              feature_variance              = feature_variance.to_f.round(2)
+              hash[klass]["#{feature}_avg"] = feature_average
+              hash[klass]["#{feature}_var"] = feature_variance
+            end
           end
         end
-
-        classes_with_features_mean
       end
 
-      def classes_with_mean
-        classes_with_mean = {}
-        classes_with_count.each_pair do |klass, klass_count|
-          classes_with_mean[klass] = (klass_count / total_count.to_f).round(2)
-        end
-        classes_with_mean
+      def select_sql
+        @select_sql ||=
+          "#{class_column}, #{averages_select_sql}, #{variances_select_sql}"
       end
 
-      def total_count
-        @total_count ||=
-          classes_with_count.values.inject(:+)
+      def averages_select_sql
+        features.map { |feature| "AVG(#{feature}) AS #{feature}_avg" }.join(',')
+      end
+
+      def variances_select_sql
+        features.map do |feature|
+          "VARIANCE(#{feature}) AS #{feature}_var"
+        end.join(',')
       end
     end
   end

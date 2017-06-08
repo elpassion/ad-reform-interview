@@ -30,24 +30,8 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
   end
 
   #TODO: add comments why I write tests for private methods
-  describe '#classes' do
-    subject { -> { described_class.new(*args).send(:classes) } }
-    before { Person.create([female, female, male]) }
-    let(:args) { valid_args }
-
-    it { expect(subject.call).to eql(['f', 'm']) }
-  end
-
-  describe '#classes_with_count' do
-    subject { -> { described_class.new(*args).send(:classes_with_count) } }
-    before { Person.create([female, female, male]) }
-    let(:args) { valid_args }
-
-    it { expect(subject.call).to eql({ 'f' => 2, 'm' => 1 }) }
-  end
-
-  describe '#classes_with_features' do
-    subject { -> { described_class.new(*args).send(:classes_with_features_mean) } }
+  describe '#averages_and_variances_grouped_by_classes' do
+    subject { -> { described_class.new(*args).send(:averages_and_variances_grouped_by_classes) } }
     before do
       Person.create([
                       female(height: 80, weight: 55),
@@ -61,20 +45,21 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
 
     it do
       expected = {
-        'f' => { 'height' => 75.0, 'weight' => 52.5 },
-        'm' => { 'height' => 86.67, 'weight' => 71.67
+        'm' => {
+          'height_avg' => 86.67,
+          'height_var' => 133.33,
+          'weight_avg' => 71.67,
+          'weight_var' => 2.33
+        },
+        'f' => {
+          'height_avg' => 75.0,
+          'height_var' => 50.0,
+          'weight_avg' => 52.5,
+          'weight_var' => 12.5
         }
       }
       expect(subject.call).to eql(expected)
     end
-  end
-
-  describe '#classes_with_mean' do
-    subject { -> { described_class.new(*args).send(:classes_with_mean) } }
-    before { Person.create([female, female, male]) }
-    let(:args) { valid_args }
-
-    it { expect(subject.call).to eql({ 'f' => 0.67, 'm' => 0.33 }) }
   end
 
   def female(height: 88, weight: 55)

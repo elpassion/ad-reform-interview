@@ -12,10 +12,13 @@
 
 ActiveRecord::Schema.define(version: 20170607083854) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "people", force: :cascade do |t|
     t.string "gender"
-    t.integer "height"
-    t.integer "weight"
+    t.integer "height", null: false
+    t.integer "weight", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
