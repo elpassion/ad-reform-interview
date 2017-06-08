@@ -62,6 +62,20 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
     end
   end
 
+  describe '#likelihood' do
+    subject do
+      -> { described_class.new(*args).send(:likelihood, *likelihood_args) }
+    end
+
+    let(:args) { valid_args }
+
+    context 'with person_feature_value=6, feature_mean=5.85, feature_variance=3.50' do
+      let(:likelihood_args) { [6, 5.85, 0.035] }
+
+      it { expect(subject.call).to be_within(0.1).of(1.54) }
+    end
+  end
+
   def female(height: 88, weight: 55)
     { gender: 'f', height: height, weight: weight }
   end

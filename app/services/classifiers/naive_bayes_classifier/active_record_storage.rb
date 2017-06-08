@@ -27,7 +27,7 @@ module Classifiers
       #   }
       # }
       def averages_and_variances_grouped_by_classes
-        {}.tap do |hash|
+        @averages_and_variances_grouped_by_classes ||= {}.tap do |hash|
           results_grouped_by_classes = ar_model.select(select_sql).group(class_column)
           results_grouped_by_classes.each do |result|
             klass       = result[class_column]
@@ -42,6 +42,13 @@ module Classifiers
             end
           end
         end
+      end
+
+      def likelihood(observed_feature_value, feature_mean, feature_variance)
+        a = 1 / Math.sqrt(2 * Math::PI * feature_variance)
+        b = -(observed_feature_value - feature_mean)**2 / (2 * feature_variance)
+        f = Math::E**b
+        a * f
       end
 
       def select_sql
