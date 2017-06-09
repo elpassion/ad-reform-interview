@@ -7,38 +7,47 @@ module Classifiers
         @ar_model     = ar_model
       end
 
-      def call
-        :female
+      def call(observed_data)
+        classes_with_likelihood = classes.map do |klass|
+          { 'class'      => klass,
+            'likelihood' => likelihood_for_class(observed_data, klass) }
+        end
+
+        classes_with_likelihood.sort_by do |hash|
+          hash['likelihood']
+        end.reverse
       end
 
       private
 
       attr_reader :ar_model, :class_column, :features
 
+      def classes
+        ar_model.select(class_column).distinct.pluck(class_column)
+      end
+
       # Returns averages and variances grouped by classes as a following structure:
       # {
       #   'm' => {
-      #     'height_avg' => 86.67,
-      #     'height_var' => 133.33,
+      #     'averages'  => { 'height' => 86.67, 'weight' => 71.67 },
+      #     'variances' => { 'height' => 133.33, 'weight' => 2.33 },
       #   },
       #   'f' => {
-      #     'height_avg' => 75.0,
-      #     'height_var' => 50.0,
+      #     'averages'  => { 'height' => 75.0, 'weight' => 52.5 },
+      #     'variances' => { 'height' => 50.0, 'weight' => 12.5 },
       #   }
       # }
-      def averages_and_variances_grouped_by_classes
-        @averages_and_variances_grouped_by_classes ||= {}.tap do |hash|
+      def means_and_variances_grouped_by_classes
+        @means_and_variances_grouped_by_classes ||= {}.tap do |hash|
           results_grouped_by_classes = ar_model.select(select_sql).group(class_column)
           results_grouped_by_classes.each do |result|
             klass       = result[class_column]
-            hash[klass] = {}
+            hash[klass] = { 'means' => {}, 'variances' => {} }
             features.each do |feature|
-              feature_average               = result["#{feature}_avg"]
-              feature_variance              = result["#{feature}_var"]
-              feature_average               = feature_average.to_f.round(2)
-              feature_variance              = feature_variance.to_f.round(2)
-              hash[klass]["#{feature}_avg"] = feature_average
-              hash[klass]["#{feature}_var"] = feature_variance
+              feature_average                   = result["#{feature}_mean"].to_f.round(2)
+              feature_variance                  = result["#{feature}_var"].to_f.round(2)
+              hash[klass]['means'][feature]     = feature_average
+              hash[klass]['variances'][feature] = feature_variance
             end
           end
         end
@@ -51,13 +60,22 @@ module Classifiers
         a * f
       end
 
+      def likelihood_for_class(observed_data, klass)
+        features.map do |feature|
+          mean     = means_and_variances_grouped_by_classes[klass].fetch('means').fetch(feature)
+          variance = means_and_variances_grouped_by_classes[klass].fetch('variances').fetch(feature)
+          value    = observed_data.fetch(feature)
+          likelihood(value, mean, variance)
+        end.inject(&:*)
+      end
+
       def select_sql
         @select_sql ||=
           "#{class_column}, #{averages_select_sql}, #{variances_select_sql}"
       end
 
       def averages_select_sql
-        features.map { |feature| "AVG(#{feature}) AS #{feature}_avg" }.join(',')
+        features.map { |feature| "AVG(#{feature}) AS #{feature}_mean" }.join(',')
       end
 
       def variances_select_sql

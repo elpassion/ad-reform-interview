@@ -29,58 +29,23 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
     end
   end
 
-  #TODO: add comments why I write tests for private methods
-  describe '#averages_and_variances_grouped_by_classes' do
-    subject { -> { described_class.new(*args).send(:averages_and_variances_grouped_by_classes) } }
-    before do
-      Person.create([
-                      female(height: 80, weight: 55),
-                      female(height: 70, weight: 50),
-                      male(height: 100, weight: 70),
-                      male(height: 80, weight: 73),
-                      male(height: 80, weight: 72),
-                    ])
-    end
-    let(:args) { valid_args }
+  describe '#call' do
+    subject { described_class.new(*args).call(*call_args) }
 
-    it do
-      expected = {
-        'm' => {
-          'height_avg' => 86.67,
-          'height_var' => 133.33,
-          'weight_avg' => 71.67,
-          'weight_var' => 2.33
-        },
-        'f' => {
-          'height_avg' => 75.0,
-          'height_var' => 50.0,
-          'weight_avg' => 52.5,
-          'weight_var' => 12.5
-        }
-      }
-      expect(subject.call).to eql(expected)
-    end
-  end
-
-  describe '#likelihood' do
-    subject do
-      -> { described_class.new(*args).send(:likelihood, *likelihood_args) }
-    end
+    before { Person::PersonImporter.from_csv(csv_file_path: Rails.root.join('db', 'training_data.csv')) }
 
     let(:args) { valid_args }
 
-    context 'with person_feature_value=6, feature_mean=5.85, feature_variance=3.50' do
-      let(:likelihood_args) { [6, 5.85, 0.035] }
+    context 'when person has average height and weight for a male' do
+      let(:call_args) { [{ 'height' => 70, 'weight' => 110 }] }
 
-      it { expect(subject.call).to be_within(0.1).of(1.54) }
+      it { expect(subject.first.fetch('class')).to eql 'm' }
     end
-  end
 
-  def female(height: 88, weight: 55)
-    { gender: 'f', height: height, weight: weight }
-  end
+    context 'when person has average height and weight for a female' do
+      let(:call_args) { [{ 'height' => 60, 'weight' => 99 }] }
 
-  def male(height: 99, weight: 66)
-    { gender: 'm', height: height, weight: weight }
+      it { expect(subject.first.fetch('class')).to eql 'f' }
+    end
   end
 end
