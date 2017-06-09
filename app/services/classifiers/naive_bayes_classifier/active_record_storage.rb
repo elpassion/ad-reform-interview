@@ -1,5 +1,6 @@
 module Classifiers
   class NaiveBayesClassifier
+    #TODO: rename
     class ActiveRecordStorage
       #TODO: replace #new with #call
       def initialize(ar_model:, class_column:, features:, observed_data:)
