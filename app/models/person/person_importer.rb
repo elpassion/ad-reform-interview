@@ -52,8 +52,8 @@ class Person
       def csv_row_to_array(csv_row)
         age    = csv_row.fetch(CSV_AGE_COLUMN).to_i
         gender = csv_row.fetch(CSV_GENDER_COLUMN)
-        height = csv_row.fetch(CSV_HEIGHT_COLUMN).to_f.round(2)
-        weight = csv_row.fetch(CSV_WEIGHT_COLUMN).to_f.round(2)
+        height = csv_row.fetch(CSV_HEIGHT_COLUMN).to_d.round(2)
+        weight = csv_row.fetch(CSV_WEIGHT_COLUMN).to_d.round(2)
         [age, gender, height, weight]
       end
     end

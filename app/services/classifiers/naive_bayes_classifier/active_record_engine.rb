@@ -6,7 +6,7 @@ module Classifiers
     class ActiveRecordEngine
       def initialize(ar_scope:, class_column:, features:, observed_data:)
         @class_column  = class_column
-        @features      = features.map(&:to_s)
+        @features      = features
         @ar_scope      = ar_scope
         @observed_data = observed_data
       end
@@ -18,7 +18,7 @@ module Classifiers
         end
 
         classes_with_likelihood.sort_by do |hash|
-          hash['likelihood']
+          hash.fetch(:likelihood)
         end.reverse
       end
 
@@ -34,14 +34,14 @@ module Classifiers
         @classes_metadata ||= {}.tap do |hash|
           results_grouped_by_classes = ar_scope.select(select_sql).group(class_column)
           results_grouped_by_classes.each do |result|
-            klass                = result[class_column]
-            hash[klass]          = { 'ratio' => 0, 'means' => {}, 'variances' => {} }
-            hash[klass]['ratio'] = result['ratio'].to_f.round(2)
+            klass               = result[class_column]
+            hash[klass]         = { ratio: nil, means: {}, variances: {} }
+            hash[klass][:ratio] = result[:ratio].to_d.round(2)
             features.each do |feature|
-              feature_average                   = result["#{feature}_mean"].to_f.round(2)
-              feature_variance                  = result["#{feature}_var"].to_f
-              hash[klass]['means'][feature]     = feature_average
-              hash[klass]['variances'][feature] = feature_variance
+              feature_average                  = result["#{feature}_mean"].to_d.round(2)
+              feature_variance                 = result["#{feature}_var"]
+              hash[klass][:means][feature]     = feature_average
+              hash[klass][:variances][feature] = feature_variance
             end
           end
         end
@@ -55,11 +55,11 @@ module Classifiers
 
       def likelihood_for_class(observed_data, klass)
         class_metadata  = classes_metadata[klass]
-        class_ratio     = class_metadata['ratio']
+        class_ratio     = class_metadata.fetch(:ratio)
         features_factor = features.map do |feature|
-          mean     = class_metadata.fetch('means').fetch(feature)
-          variance = class_metadata.fetch('variances').fetch(feature)
-          value    = observed_data.fetch(feature.to_sym) #TODO: remove #to_sym
+          mean     = class_metadata.fetch(:means).fetch(feature)
+          variance = class_metadata.fetch(:variances).fetch(feature)
+          value    = observed_data.fetch(feature)
           likelihood(value, mean, variance)
         end.inject(&:*)
         class_ratio * features_factor

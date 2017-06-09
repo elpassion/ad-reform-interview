@@ -15,12 +15,12 @@ describe Person::PersonImporter do
         last_person  = collection.last
         expect(first_person.age_in_months).to eql(165)
         expect(first_person.gender).to eql('f')
-        expect(first_person.height.to_f).to eql(70.2)
-        expect(first_person.weight.to_f).to eql(80.6)
+        expect(first_person.height).to eql(70.2.to_d)
+        expect(first_person.weight).to eql(80.6.to_d)
         expect(last_person.age_in_months).to eql(234)
         expect(last_person.gender).to eql('m')
-        expect(last_person.height.to_f).to eql(60.8)
-        expect(last_person.weight.to_f).to eql(85.2)
+        expect(last_person.height).to eql(60.8.to_d)
+        expect(last_person.weight).to eql(85.2.to_d)
       end
     end
 

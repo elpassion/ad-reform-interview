@@ -4,7 +4,6 @@ module Classifiers
     require_relative 'naive_bayes_classifier/active_record_engine'
     private_constant :ActiveRecordEngine
 
-    #TODO: what about strings as keys? Can I remove them?
     ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_scope class_column features].freeze
     private_constant :ACTIVE_RECORD_ENGINE_OPTIONS
 
