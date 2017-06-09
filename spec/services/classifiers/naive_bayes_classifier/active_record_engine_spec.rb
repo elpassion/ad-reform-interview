@@ -32,7 +32,7 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   describe '#call' do
     before do
       Person::PersonImporter.from_csv_to_db(
-        csv_file_path: Rails.root.join('db', 'training_data.csv')
+        csv_file_path: Rails.root.join('spec', 'data', 'training_data.csv')
       )
     end
 
@@ -42,7 +42,7 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
 
     let(:test_data) do
       Person::PersonImporter.from_csv_to_memory(
-        csv_file_path: Rails.root.join('db', 'test_data.csv')
+        csv_file_path: Rails.root.join('spec', 'data', 'test_data.csv')
       )
     end
 
