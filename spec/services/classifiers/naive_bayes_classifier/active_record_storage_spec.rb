@@ -30,27 +30,33 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
   end
 
   describe '#call' do
-    subject { described_class.new(*args).call }
-
-    before { Person::PersonImporter.from_csv(csv_file_path: Rails.root.join('db', 'training_data.csv')) }
-
-    let(:args) do
-      [
-        ar_model:      Person,
-        class_column:  :gender,
-        features:      %i[height weight],
-        observed_data: person_data
-      ]
+    before do
+      Person::PersonImporter.from_csv_to_db(
+        csv_file_path: Rails.root.join('db', 'training_data.csv')
+      )
     end
 
-    context 'when person has average height and weight for a male' do
-      let(:person_data) { { 'height' => 70, 'weight' => 110 } }
-      it { expect(subject.first.fetch('class')).to eql 'm' }
+    let(:opts) do
+      { ar_model: Person, class_column: :gender, features: %i[height weight] }
     end
 
-    context 'when person has average height and weight for a female' do
-      let(:person_data) { { 'height' => 60, 'weight' => 99 } }
-      it { expect(subject.first.fetch('class')).to eql 'f' }
+    let(:test_data) do
+      Person::PersonImporter.from_csv_to_memory(
+        csv_file_path: Rails.root.join('db', 'test_data.csv')
+      )
+    end
+
+    it 'has accuracy greater than 0.75' do
+      correct_predictions = 0
+      test_data.each do |person|
+        opts[:observed_data] = person
+        results              = described_class.new(opts).call
+        actual_gender        = person.fetch(:gender)
+        calculated_gender    = results.first.fetch('class')
+        correct_predictions += 1 if calculated_gender == actual_gender
+      end
+      accuracy = correct_predictions / test_data.size.to_f
+      expect(accuracy).to be > 0.75
     end
   end
 end

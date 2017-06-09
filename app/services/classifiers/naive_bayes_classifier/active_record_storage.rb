@@ -1,6 +1,7 @@
 module Classifiers
   class NaiveBayesClassifier
     class ActiveRecordStorage
+      #TODO: replace #new with #call
       def initialize(ar_model:, class_column:, features:, observed_data:)
         @class_column  = class_column
         @features      = features.map(&:to_s)
@@ -65,7 +66,7 @@ module Classifiers
         features.map do |feature|
           mean     = means_and_variances_grouped_by_classes[klass].fetch('means').fetch(feature)
           variance = means_and_variances_grouped_by_classes[klass].fetch('variances').fetch(feature)
-          value    = observed_data.fetch(feature)
+          value    = observed_data.fetch(feature.to_sym) #TODO: remove #to_sym
           likelihood(value, mean, variance)
         end.inject(&:*)
       end
