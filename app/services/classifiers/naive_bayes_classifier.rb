@@ -8,7 +8,8 @@ module Classifiers
     ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_scope class_column features].freeze
     private_constant :ACTIVE_RECORD_ENGINE_OPTIONS
 
-    REQUIRED_OPTIONS = %i[observed_data].freeze; private_constant :REQUIRED_OPTIONS
+    REQUIRED_OPTIONS = %i[observed_data].freeze
+    private_constant :REQUIRED_OPTIONS
 
     ALLOWED_OPTIONS = REQUIRED_OPTIONS + ACTIVE_RECORD_ENGINE_OPTIONS
     private_constant :ALLOWED_OPTIONS

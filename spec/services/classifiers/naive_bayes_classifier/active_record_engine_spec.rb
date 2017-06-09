@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+#TODO: enough tests?
 describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   let(:valid_args) do
     [
@@ -52,7 +53,7 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
         opts[:observed_data] = person
         results              = described_class.new(opts).call
         actual_gender        = person.fetch(:gender)
-        calculated_gender    = results.first.fetch('class')
+        calculated_gender    = results.first.fetch(:class)
         correct_predictions += 1 if calculated_gender == actual_gender
       end
       accuracy = correct_predictions / test_data.size.to_f

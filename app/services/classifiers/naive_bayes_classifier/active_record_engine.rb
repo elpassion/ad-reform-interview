@@ -1,7 +1,9 @@
 module Classifiers
   class NaiveBayesClassifier
+    # Returns classes sorted by likelihood as following structure:
+    # [{ class: "f", likelihood: 0.007850654 },
+    #  { class: "m", likelihood: 0.001904104 }]
     class ActiveRecordEngine
-      #TODO: replace #new with #call
       def initialize(ar_scope:, class_column:, features:, observed_data:)
         @class_column  = class_column
         @features      = features.map(&:to_s)
@@ -11,8 +13,8 @@ module Classifiers
 
       def call
         classes_with_likelihood = classes.map do |klass|
-          { 'class'      => klass,
-            'likelihood' => likelihood_for_class(observed_data, klass) }
+          { class:      klass,
+            likelihood: likelihood_for_class(observed_data, klass) }
         end
 
         classes_with_likelihood.sort_by do |hash|
@@ -28,19 +30,8 @@ module Classifiers
         ar_scope.select(class_column).distinct.pluck(class_column)
       end
 
-      # Returns averages and variances grouped by classes as a following structure:
-      # {
-      #   'm' => {
-      #     'averages'  => { 'height' => 86.67, 'weight' => 71.67 },
-      #     'variances' => { 'height' => 133.33, 'weight' => 2.33 },
-      #   },
-      #   'f' => {
-      #     'averages'  => { 'height' => 75.0, 'weight' => 52.5 },
-      #     'variances' => { 'height' => 50.0, 'weight' => 12.5 },
-      #   }
-      # }
-      def means_and_variances_grouped_by_classes
-        @means_and_variances_grouped_by_classes ||= {}.tap do |hash|
+      def classes_metadata
+        @classes_metadata ||= {}.tap do |hash|
           results_grouped_by_classes = ar_scope.select(select_sql).group(class_column)
           results_grouped_by_classes.each do |result|
             klass                = result[class_column]
@@ -57,18 +48,17 @@ module Classifiers
       end
 
       def likelihood(observed_feature_value, feature_mean, feature_variance)
-        #TODO: rename vars
-        a = 1 / Math.sqrt(2 * Math::PI * feature_variance)
-        b = -(observed_feature_value - feature_mean)**2 / (2 * feature_variance)
-        c = Math::E**b
-        a * c
+        exp_power = (observed_feature_value - feature_mean)**2 / (2 * feature_variance)
+        exp       = Math::E ** -exp_power
+        1 / Math.sqrt(2 * Math::PI * feature_variance) * exp
       end
 
       def likelihood_for_class(observed_data, klass)
-        class_ratio     = means_and_variances_grouped_by_classes[klass]['ratio']
+        class_metadata  = classes_metadata[klass]
+        class_ratio     = class_metadata['ratio']
         features_factor = features.map do |feature|
-          mean     = means_and_variances_grouped_by_classes[klass].fetch('means').fetch(feature)
-          variance = means_and_variances_grouped_by_classes[klass].fetch('variances').fetch(feature)
+          mean     = class_metadata.fetch('means').fetch(feature)
+          variance = class_metadata.fetch('variances').fetch(feature)
           value    = observed_data.fetch(feature.to_sym) #TODO: remove #to_sym
           likelihood(value, mean, variance)
         end.inject(&:*)
