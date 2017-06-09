@@ -37,7 +37,7 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
     end
 
     let(:opts) do
-      { ar_model: Person, class_column: :gender, features: %i[age_in_months height weight] }
+      { ar_model: Person, class_column: :gender, features: %i[height weight] }
     end
 
     let(:test_data) do
