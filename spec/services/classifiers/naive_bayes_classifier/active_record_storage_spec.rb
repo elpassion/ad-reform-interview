@@ -3,9 +3,10 @@ require 'rails_helper'
 describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
   let(:valid_args) do
     [
-      ar_model:     Person,
-      class_column: :gender,
-      features:     %i[height weight]
+      ar_model:      Person,
+      class_column:  :gender,
+      features:      %i[height weight],
+      observed_data: { height: 100, weight: 100 }
     ]
   end
 
@@ -19,32 +20,36 @@ describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
 
     context 'with no :ar_model, no :class_column and no :features' do
       let(:args) { [wrong: :key] }
-      it { expect(subject).to raise_error(ArgumentError, 'missing keywords: ar_model, class_column, features') }
+      it { expect(subject).to raise_error(ArgumentError, 'missing keywords: ar_model, class_column, features, observed_data') }
     end
 
     context 'with valid arguments' do
       let(:args) { valid_args }
-
       it { expect(subject).to_not raise_error }
     end
   end
 
   describe '#call' do
-    subject { described_class.new(*args).call(*call_args) }
+    subject { described_class.new(*args).call }
 
     before { Person::PersonImporter.from_csv(csv_file_path: Rails.root.join('db', 'training_data.csv')) }
 
-    let(:args) { valid_args }
+    let(:args) do
+      [
+        ar_model:      Person,
+        class_column:  :gender,
+        features:      %i[height weight],
+        observed_data: person_data
+      ]
+    end
 
     context 'when person has average height and weight for a male' do
-      let(:call_args) { [{ 'height' => 70, 'weight' => 110 }] }
-
+      let(:person_data) { { 'height' => 70, 'weight' => 110 } }
       it { expect(subject.first.fetch('class')).to eql 'm' }
     end
 
     context 'when person has average height and weight for a female' do
-      let(:call_args) { [{ 'height' => 60, 'weight' => 99 }] }
-
+      let(:person_data) { { 'height' => 60, 'weight' => 99 } }
       it { expect(subject.first.fetch('class')).to eql 'f' }
     end
   end

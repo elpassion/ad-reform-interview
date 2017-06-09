@@ -1,5 +1,4 @@
 module Classifiers
-  # Classifies Person as a female or male
   class GenderClassifier
     extend Service
 
@@ -11,19 +10,26 @@ module Classifiers
     end
 
     def call
-      Classifiers::NaiveBayesClassifier.call(ar_model:     Person,
-                                             class_column: :gender,
-                                             features:     %i[height weight])
+      Classifiers::NaiveBayesClassifier.call(ar_model:      Person,
+                                             class_column:  :gender,
+                                             features:      %i[height weight],
+                                             observed_data: person_data)
     end
 
     private
 
+    attr_reader :height, :weight
+
+    def person_data
+      { height: height, weight: weight }
+    end
+
     def validate_height(height)
-      raise(TypeError.new('height must be Integer')) unless height.is_a?(Integer)
+      raise(TypeError, 'height must be Integer') unless height.is_a?(Integer)
     end
 
     def validate_weight(weight)
-      raise(TypeError.new('weight must be Integer')) unless weight.is_a?(Integer)
+      raise(TypeError, 'weight must be Integer') unless weight.is_a?(Integer)
     end
   end
 end

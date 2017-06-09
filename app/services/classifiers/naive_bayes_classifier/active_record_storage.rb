@@ -1,13 +1,14 @@
 module Classifiers
   class NaiveBayesClassifier
     class ActiveRecordStorage
-      def initialize(ar_model:, class_column:, features:)
-        @class_column = class_column
-        @features     = features.map(&:to_s)
-        @ar_model     = ar_model
+      def initialize(ar_model:, class_column:, features:, observed_data:)
+        @class_column  = class_column
+        @features      = features.map(&:to_s)
+        @ar_model      = ar_model
+        @observed_data = observed_data
       end
 
-      def call(observed_data)
+      def call
         classes_with_likelihood = classes.map do |klass|
           { 'class'      => klass,
             'likelihood' => likelihood_for_class(observed_data, klass) }
@@ -20,7 +21,7 @@ module Classifiers
 
       private
 
-      attr_reader :ar_model, :class_column, :features
+      attr_reader :ar_model, :class_column, :features, :observed_data
 
       def classes
         ar_model.select(class_column).distinct.pluck(class_column)
