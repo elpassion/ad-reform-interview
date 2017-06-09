@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Classifiers::NaiveBayesClassifier::ActiveRecordStorage do
+describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   let(:valid_args) do
     [
       ar_model:      Person,

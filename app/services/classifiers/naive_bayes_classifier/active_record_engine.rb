@@ -1,7 +1,6 @@
 module Classifiers
   class NaiveBayesClassifier
-    #TODO: rename
-    class ActiveRecordStorage
+    class ActiveRecordEngine
       #TODO: replace #new with #call
       def initialize(ar_model:, class_column:, features:, observed_data:)
         @class_column  = class_column
@@ -77,8 +76,12 @@ module Classifiers
       end
 
       def select_sql
-        @select_sql ||=
-          "#{class_column}, #{ratio_select_sql}, #{averages_select_sql}, #{variances_select_sql}"
+        @select_sql ||= [
+          class_column,
+          ratio_select_sql,
+          averages_select_sql,
+          variances_select_sql
+        ].join(',')
       end
 
       def averages_select_sql

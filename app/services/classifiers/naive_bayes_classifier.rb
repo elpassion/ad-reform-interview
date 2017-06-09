@@ -1,33 +1,34 @@
 module Classifiers
   class NaiveBayesClassifier
-    #TODO: add array_storage
-    require_relative 'naive_bayes_classifier/active_record_storage'
+    #TODO: add pure ruby engine
+    require_relative 'naive_bayes_classifier/active_record_engine'
+    private_constant :ActiveRecordEngine
 
     #TODO: what about strings as keys? Can I remove them?
     #TODO: rename :ar_model to :scope
-    ACTIVE_RECORD_STORAGE_OPTIONS = %i[ar_model class_column features].freeze
-    private_constant :ACTIVE_RECORD_STORAGE_OPTIONS
+    ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_model class_column features].freeze
+    private_constant :ACTIVE_RECORD_ENGINE_OPTIONS
 
     REQUIRED_OPTIONS = %i[observed_data].freeze; private_constant :REQUIRED_OPTIONS
 
-    ALLOWED_OPTIONS = REQUIRED_OPTIONS + ACTIVE_RECORD_STORAGE_OPTIONS
+    ALLOWED_OPTIONS = REQUIRED_OPTIONS + ACTIVE_RECORD_ENGINE_OPTIONS
     private_constant :ALLOWED_OPTIONS
 
     class << self
       def call(opts)
         validate_opts(opts)
-        strategy(opts).call
+        engine(opts).call
       end
 
       private
 
-      def strategy(opts)
+      def engine(opts)
         keys = opts.keys
-        if (ACTIVE_RECORD_STORAGE_OPTIONS & keys).size == ACTIVE_RECORD_STORAGE_OPTIONS.size
-          Classifiers::NaiveBayesClassifier::ActiveRecordStorage.new(opts)
+        if (ACTIVE_RECORD_ENGINE_OPTIONS - keys).empty?
+          ActiveRecordEngine.new(opts)
         else
-          raise StrategyNotFound,
-                "Could not find strategy for following options: #{keys}"
+          raise EngineNotFound,
+                "Could not find engine for following options: #{keys}"
         end
       end
 
@@ -46,6 +47,6 @@ module Classifiers
     end
   end
 
-  class StrategyNotFound < StandardError;
+  class EngineNotFound < StandardError;
   end
 end
