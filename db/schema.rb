@@ -17,8 +17,9 @@ ActiveRecord::Schema.define(version: 20170607083854) do
 
   create_table "people", force: :cascade do |t|
     t.string "gender"
-    t.integer "height", null: false
-    t.integer "weight", null: false
+    t.integer "age_in_months", null: false
+    t.decimal "height", precision: 5, scale: 2, null: false
+    t.decimal "weight", precision: 5, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
