@@ -9,22 +9,16 @@ class Person
 
       # This is designed to be fast, not safe.
       # Use it to import large data from a safe source.
-      def from_csv(csv_file_path:)
+      def from_csv_to_db(csv_file_path:)
         sql_values = ''
-        now = Time.now.to_s(:db)
+        now        = Time.now.to_s(:db)
 
-        # CSV.foreach for low memory usage
-        enumerator = CSV.foreach(csv_file_path, headers: true)
-        enumerator.each do |row|
-          gender = row.fetch(CSV_GENDER_COLUMN)
-          height = row.fetch(CSV_HEIGHT_COLUMN)
-          weight = row.fetch(CSV_WEIGHT_COLUMN)
-          height = height.to_f.round
-          weight = weight.to_f.round
-          sql_values << "('#{gender}', #{height}, #{weight}, '#{now}', '#{now}'),"  # Using #<< for performance
+        each_csv_row(csv_file_path: csv_file_path) do |row|
+          gender, height, weight = row
+          sql_values << "('#{gender}', #{height}, #{weight}, '#{now}', '#{now}')," # Using #<< for performance
         end
 
-        sql_values = sql_values.chomp(',')
+        sql_values  = sql_values.chomp(',')
         sql_columns = 'gender, height, weight, created_at, updated_at'
 
         sql = <<-SQL
@@ -34,6 +28,33 @@ class Person
         # Bulk insert (no validation and possible sql injection!)
         # Unfortunately, bulk insert is not possible with Arel yet :(
         ActiveRecord::Base.connection.execute(sql)
+      end
+
+      def from_csv_to_memory(csv_file_path:)
+        [].tap do |array|
+          each_csv_row(csv_file_path: csv_file_path) do |row|
+            gender, height, weight = row
+            array << { gender: gender, height: height, weight: weight }
+          end
+        end
+      end
+
+      private
+
+      def each_csv_row(csv_file_path:)
+        # CSV.foreach for low memory usage
+        CSV.foreach(csv_file_path, headers: true).each do |row|
+          yield(csv_row_to_array(row))
+        end
+      end
+
+      def csv_row_to_array(csv_row)
+        gender = csv_row.fetch(CSV_GENDER_COLUMN)
+        height = csv_row.fetch(CSV_HEIGHT_COLUMN)
+        weight = csv_row.fetch(CSV_WEIGHT_COLUMN)
+        height = height.to_f.round
+        weight = weight.to_f.round
+        [gender, height, weight]
       end
     end
   end
