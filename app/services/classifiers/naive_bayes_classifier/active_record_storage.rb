@@ -48,7 +48,7 @@ module Classifiers
             hash[klass]['ratio'] = result['ratio'].to_f.round(2)
             features.each do |feature|
               feature_average                   = result["#{feature}_mean"].to_f.round(2)
-              feature_variance                  = result["#{feature}_var"].to_f.round(2)
+              feature_variance                  = result["#{feature}_var"].to_f
               hash[klass]['means'][feature]     = feature_average
               hash[klass]['variances'][feature] = feature_variance
             end
