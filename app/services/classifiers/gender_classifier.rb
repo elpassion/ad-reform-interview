@@ -10,7 +10,7 @@ module Classifiers
     end
 
     def call
-      Classifiers::NaiveBayesClassifier.call(ar_model:      Person,
+      Classifiers::NaiveBayesClassifier.call(ar_scope:      Person,
                                              class_column:  :gender,
                                              features:      %i[height weight],
                                              observed_data: person_data)

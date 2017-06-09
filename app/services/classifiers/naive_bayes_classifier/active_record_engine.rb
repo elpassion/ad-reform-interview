@@ -2,10 +2,10 @@ module Classifiers
   class NaiveBayesClassifier
     class ActiveRecordEngine
       #TODO: replace #new with #call
-      def initialize(ar_model:, class_column:, features:, observed_data:)
+      def initialize(ar_scope:, class_column:, features:, observed_data:)
         @class_column  = class_column
         @features      = features.map(&:to_s)
-        @ar_model      = ar_model
+        @ar_scope      = ar_scope
         @observed_data = observed_data
       end
 
@@ -22,10 +22,10 @@ module Classifiers
 
       private
 
-      attr_reader :ar_model, :class_column, :features, :observed_data
+      attr_reader :ar_scope, :class_column, :features, :observed_data
 
       def classes
-        ar_model.select(class_column).distinct.pluck(class_column)
+        ar_scope.select(class_column).distinct.pluck(class_column)
       end
 
       # Returns averages and variances grouped by classes as a following structure:
@@ -41,7 +41,7 @@ module Classifiers
       # }
       def means_and_variances_grouped_by_classes
         @means_and_variances_grouped_by_classes ||= {}.tap do |hash|
-          results_grouped_by_classes = ar_model.select(select_sql).group(class_column)
+          results_grouped_by_classes = ar_scope.select(select_sql).group(class_column)
           results_grouped_by_classes.each do |result|
             klass                = result[class_column]
             hash[klass]          = { 'ratio' => 0, 'means' => {}, 'variances' => {} }

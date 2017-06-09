@@ -5,8 +5,7 @@ module Classifiers
     private_constant :ActiveRecordEngine
 
     #TODO: what about strings as keys? Can I remove them?
-    #TODO: rename :ar_model to :scope
-    ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_model class_column features].freeze
+    ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_scope class_column features].freeze
     private_constant :ACTIVE_RECORD_ENGINE_OPTIONS
 
     REQUIRED_OPTIONS = %i[observed_data].freeze; private_constant :REQUIRED_OPTIONS
@@ -40,9 +39,7 @@ module Classifiers
         end
 
         non_allowed_keys = ALLOWED_OPTIONS - keys
-        if non_allowed_keys.any?
-          raise TypeError, "Unknown keys: #{non_allowed_keys}"
-        end
+        raise TypeError, "Unknown keys: #{non_allowed_keys}" if non_allowed_keys.any?
       end
     end
   end

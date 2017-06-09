@@ -3,7 +3,7 @@ require 'rails_helper'
 describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   let(:valid_args) do
     [
-      ar_model:      Person,
+      ar_scope:      Person,
       class_column:  :gender,
       features:      %i[height weight],
       observed_data: { height: 100, weight: 100 }
@@ -18,9 +18,9 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
       it { expect(subject).to raise_error(ArgumentError) }
     end
 
-    context 'with no :ar_model, no :class_column and no :features' do
+    context 'with no :ar_scope, no :class_column and no :features' do
       let(:args) { [wrong: :key] }
-      it { expect(subject).to raise_error(ArgumentError, 'missing keywords: ar_model, class_column, features, observed_data') }
+      it { expect(subject).to raise_error(ArgumentError, 'missing keywords: ar_scope, class_column, features, observed_data') }
     end
 
     context 'with valid arguments' do
@@ -37,7 +37,7 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
     end
 
     let(:opts) do
-      { ar_model: Person, class_column: :gender, features: %i[height weight] }
+      { ar_scope: Person, class_column: :gender, features: %i[height weight] }
     end
 
     let(:test_data) do
