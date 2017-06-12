@@ -17,6 +17,10 @@ module Classifiers
             likelihood: likelihood_for_class(observed_data, klass) }
         end
 
+        if classes_with_likelihood.empty?
+          raise Classifiers::CouldNotCalculateError, 'not enough data'
+        end
+
         classes_with_likelihood.sort_by do |hash|
           hash.fetch(:likelihood)
         end.reverse
@@ -40,9 +44,11 @@ module Classifiers
             features.each do |feature|
               feature_average  = result["#{feature}_mean"].to_d.round(2)
               feature_variance = result["#{feature}_var"]
-              if feature_variance.nil?
-                raise CouldNotCalculateError, "variance could not be calculated for the following feature: #{feature}"
+
+              if feature_variance.nil? || feature_variance.zero?
+                raise Classifiers::CouldNotCalculateError, "could not calculate variance for: #{feature}"
               end
+
               hash[klass][:means][feature]     = feature_average
               hash[klass][:variances][feature] = feature_variance
             end

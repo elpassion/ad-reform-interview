@@ -35,7 +35,7 @@ module Classifiers
       elsif (RUBY_ENGINE_OPTIONS - keys).empty?
         RubyEngine.new(opts)
       else
-        raise EngineNotFound,
+        raise Classifiers::EngineNotFoundError,
               "Could not find engine for following options: #{keys}"
       end
     end

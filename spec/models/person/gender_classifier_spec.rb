@@ -7,7 +7,11 @@ describe Person::GenderClassifier do
     context 'with valid arguments' do
       let(:args) { Person.new(height: 100, weight: 80) }
 
-      it { expect(subject).to_not raise_error }
+      it do
+        error_class   = Classifiers::CouldNotCalculateError
+        error_message = 'not enough data'
+        expect(subject).to raise_error(error_class, error_message)
+      end
 
       it 'should use NaiveBayesClassifier' do
         naive_double = double(Classifiers::NaiveBayesClassifier, call: true)
@@ -18,6 +22,7 @@ describe Person::GenderClassifier do
           observed_data: { height: 100, weight: 80 }
         ).and_return(naive_double)
         expect(naive_double).to receive(:call)
+
         subject.call
       end
     end

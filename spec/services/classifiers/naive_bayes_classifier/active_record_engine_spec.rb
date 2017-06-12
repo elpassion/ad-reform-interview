@@ -32,23 +32,46 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   describe '#call' do
     subject { described_class.new(*args).call }
 
-    before do
-      Person.create([{ height: 95, weight: 102, gender: :m },
-                     { height: 100, weight: 100, gender: :m },
-                     { height: 80, weight: 80, gender: :f },
-                     { height: 70, weight: 60, gender: :f }])
-    end
-
     let(:args) { valid_args }
 
-    it 'should return array of hashes' do
-      expect(subject.size).to eql(2)
-      expect(subject[0].keys).to eql(%i[class likelihood])
-      expect(subject[1].keys).to eql(%i[class likelihood])
-      expect(subject[0][:class]).to eql(:m)
-      expect(subject[1][:class]).to eql(:f)
-      expect(subject[0][:likelihood]).to be_instance_of BigDecimal
-      expect(subject[1][:likelihood]).to be_instance_of BigDecimal
+    context 'with reasonable training data' do
+      before do
+        Person.create([{ height: 95, weight: 102, gender: :m },
+                       { height: 100, weight: 100, gender: :m },
+                       { height: 80, weight: 80, gender: :f },
+                       { height: 70, weight: 60, gender: :f }])
+      end
+
+      it 'should return array of hashes' do
+        expect(subject.size).to eql(2)
+        expect(subject[0].keys).to eql(%i[class likelihood])
+        expect(subject[1].keys).to eql(%i[class likelihood])
+        expect(subject[0][:class]).to eql(:m)
+        expect(subject[1][:class]).to eql(:f)
+        expect(subject[0][:likelihood]).to be_instance_of BigDecimal
+        expect(subject[1][:likelihood]).to be_instance_of BigDecimal
+      end
+    end
+
+    context 'with no training data' do
+      it do
+        error_class   = Classifiers::CouldNotCalculateError
+        error_message = 'not enough data'
+        expect { subject }.to raise_error(error_class, error_message)
+      end
+    end
+
+    context 'with multiple identical records' do
+      before do
+        Person.create([{ height: 100, weight: 100, gender: :m },
+                       { height: 100, weight: 100, gender: :m }])
+      end
+
+      it do
+        error_class   = Classifiers::CouldNotCalculateError
+        error_message = 'could not calculate variance for: height'
+        expect { subject }.to raise_error(error_class, error_message)
+      end
     end
   end
 
