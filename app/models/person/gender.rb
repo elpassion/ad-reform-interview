@@ -6,7 +6,7 @@ class Person
       m: 'Male',
       f: 'Female',
       nil => 'Unknown'
-    }.freeze; private_constant :VALUE_TO_LABEL
+    }.freeze
 
     attr_reader :value
 
