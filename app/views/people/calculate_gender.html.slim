@@ -1,5 +1,11 @@
 p
   strong Calculated gender:
-  = @person.calculated_gender
+  = @gender
+
+div
+  - if @gender.female?
+    = image_tag 'wonderwoman.jpg'
+  - elsif @gender.male?
+    = image_tag 'superman.jpg'
 
 = link_to 'Back', people_path

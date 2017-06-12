@@ -2,8 +2,6 @@ module Classifiers
   class NaiveBayesClassifier
     require_relative 'naive_bayes_classifier/active_record_engine'
     require_relative 'naive_bayes_classifier/ruby_engine'
-    private_constant :ActiveRecordEngine
-    private_constant :RubyEngine
 
     ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_scope class_column features].freeze
     private_constant :ACTIVE_RECORD_ENGINE_OPTIONS

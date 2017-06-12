@@ -14,6 +14,14 @@ class Person
       @value = build_value(value)
     end
 
+    def female?
+      value == :f
+    end
+
+    def male?
+      value == :m
+    end
+
     def to_s
       VALUE_TO_LABEL.fetch(value)
     end

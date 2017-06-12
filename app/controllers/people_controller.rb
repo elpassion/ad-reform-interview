@@ -5,6 +5,10 @@ class PeopleController < ApplicationController
     @people = Person.all.order(created_at: :desc)
   end
 
+  def calculate_gender
+    @gender = @person.calculated_gender
+  end
+
   def new
     @person = Person.new
   end
