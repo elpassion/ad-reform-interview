@@ -1,4 +1,4 @@
-module Classifiers
+class Person
   class GenderClassifier
     extend Service
 
@@ -7,11 +7,8 @@ module Classifiers
       naive_bayes: :naive_bayes_classifier
     }.freeze; private_constant :CLASSIFIERS
 
-    def initialize(height:, weight:)
-      validate_height(height)
-      validate_weight(weight)
-      @height = height
-      @weight = weight
+    def initialize(person)
+      @person = person
     end
 
     def call
@@ -25,7 +22,7 @@ module Classifiers
 
     private
 
-    attr_reader :height, :weight
+    attr_reader :person
 
     def classifier
       @classifier ||= naive_bayes_classifier
@@ -39,19 +36,11 @@ module Classifiers
       Classifiers::NaiveBayesClassifier.new(ar_scope:      Person,
                                             class_column:  :gender,
                                             features:      %i[height weight],
-                                            observed_data: person_data)
+                                            observed_data: person_features)
     end
 
-    def person_data
-      { height: height, weight: weight }
-    end
-
-    def validate_height(height)
-      raise(TypeError, 'height must be Integer') unless height.is_a?(Integer)
-    end
-
-    def validate_weight(weight)
-      raise(TypeError, 'weight must be Integer') unless weight.is_a?(Integer)
+    def person_features
+      { height: person.height, weight: person.weight }
     end
   end
 end

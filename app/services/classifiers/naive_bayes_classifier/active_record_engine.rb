@@ -38,8 +38,8 @@ module Classifiers
             hash[klass]         = { ratio: nil, means: {}, variances: {} }
             hash[klass][:ratio] = result[:ratio].to_d.round(2)
             features.each do |feature|
-              feature_average                  = result["#{feature}_mean"].to_d.round(2)
-              feature_variance                 = result["#{feature}_var"]
+              feature_average  = result["#{feature}_mean"].to_d.round(2)
+              feature_variance = result["#{feature}_var"]
               if feature_variance.nil?
                 raise CouldNotCalculateError, "variance could not be calculated for the following feature: #{feature}"
               end
@@ -57,7 +57,7 @@ module Classifiers
       end
 
       def likelihood_for_class(observed_data, klass)
-        class_metadata  = classes_metadata[klass]
+        class_metadata  = classes_metadata.fetch(klass)
         class_ratio     = class_metadata.fetch(:ratio)
         features_factor = features.map do |feature|
           mean     = class_metadata.fetch(:means).fetch(feature)
@@ -91,7 +91,8 @@ module Classifiers
         end.join(',')
       end
 
-      class CouldNotCalculateError < StandardError; end
+      class CouldNotCalculateError < StandardError
+      end
     end
   end
 end
