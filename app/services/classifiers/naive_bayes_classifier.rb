@@ -13,37 +13,39 @@ module Classifiers
     ALLOWED_OPTIONS = REQUIRED_OPTIONS + ACTIVE_RECORD_ENGINE_OPTIONS
     private_constant :ALLOWED_OPTIONS
 
-    class << self
-      def call(opts)
-        validate_opts(opts)
-        engine(opts).call
+    def initialize(opts)
+      @opts = opts
+      validate_opts
+    end
+
+    def call
+      engine.call
+    end
+
+    private
+
+    attr_reader :opts
+
+    def engine
+      keys = opts.keys
+      if (ACTIVE_RECORD_ENGINE_OPTIONS - keys).empty?
+        ActiveRecordEngine.new(opts)
+      else
+        raise EngineNotFound,
+              "Could not find engine for following options: #{keys}"
       end
+    end
 
-      private
+    def validate_opts
+      keys = opts.keys
 
-      def engine(opts)
-        keys = opts.keys
-        if (ACTIVE_RECORD_ENGINE_OPTIONS - keys).empty?
-          ActiveRecordEngine.new(opts)
-        else
-          raise EngineNotFound,
-                "Could not find engine for following options: #{keys}"
-        end
-      end
+      missing_keys = REQUIRED_OPTIONS - keys
+      raise TypeError, "Missing required keys: #{missing_keys}" if missing_keys.any?
 
-      def validate_opts(opts)
-        keys = opts.keys
-        missing_keys = REQUIRED_OPTIONS - keys
-        if missing_keys.any?
-          raise TypeError, "Missing required keys: #{missing_keys}"
-        end
-
-        non_allowed_keys = ALLOWED_OPTIONS - keys
-        raise TypeError, "Unknown keys: #{non_allowed_keys}" if non_allowed_keys.any?
-      end
+      non_allowed_keys = ALLOWED_OPTIONS - keys
+      raise TypeError, "Unknown keys: #{non_allowed_keys}" if non_allowed_keys.any?
     end
   end
 
-  class EngineNotFound < StandardError;
-  end
+  class EngineNotFound < StandardError; end
 end

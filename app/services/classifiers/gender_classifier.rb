@@ -10,15 +10,23 @@ module Classifiers
     end
 
     def call
-      Classifiers::NaiveBayesClassifier.call(ar_scope:      Person,
-                                             class_column:  :gender,
-                                             features:      %i[height weight],
-                                             observed_data: person_data)
+      classifier.call
+    end
+
+    def classifier
+      @classifier ||= naive_bayes_classifier
     end
 
     private
 
     attr_reader :height, :weight
+
+    def naive_bayes_classifier
+      Classifiers::NaiveBayesClassifier.new(ar_scope:      Person,
+                                            class_column:  :gender,
+                                            features:      %i[height weight],
+                                            observed_data: person_data)
+    end
 
     def person_data
       { height: height, weight: weight }
