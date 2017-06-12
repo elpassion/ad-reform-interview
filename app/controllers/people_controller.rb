@@ -2,7 +2,7 @@ class PeopleController < ApplicationController
   before_action :set_person, only: %i[show edit update destroy]
 
   def index
-    @people = Person.all
+    @people = Person.all.order(created_at: :desc)
   end
 
   def new

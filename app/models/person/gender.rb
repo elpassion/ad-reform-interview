@@ -21,7 +21,7 @@ class Person
     attr_reader :value
 
     def build_value(value)
-      value ? value.to_sym : nil
+      value.present? ? value.to_sym : nil
     end
   end
 end
