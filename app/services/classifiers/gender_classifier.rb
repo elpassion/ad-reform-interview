@@ -2,6 +2,11 @@ module Classifiers
   class GenderClassifier
     extend Service
 
+    CLASSIFIERS = {
+      dummy:       :dummy_classifier,
+      naive_bayes: :naive_bayes_classifier
+    }.freeze; private_constant :CLASSIFIERS
+
     def initialize(height:, weight:)
       validate_height(height)
       validate_weight(weight)
@@ -13,13 +18,22 @@ module Classifiers
       classifier.call
     end
 
-    def classifier
-      @classifier ||= naive_bayes_classifier
+    def with_classifier(classifier_name)
+      @classifier = send(CLASSIFIERS.fetch(classifier_name))
+      self
     end
 
     private
 
     attr_reader :height, :weight
+
+    def classifier
+      @classifier ||= naive_bayes_classifier
+    end
+
+    def dummy_classifier
+      Classifiers::DummyClassifier.new(klass: :f)
+    end
 
     def naive_bayes_classifier
       Classifiers::NaiveBayesClassifier.new(ar_scope:      Person,

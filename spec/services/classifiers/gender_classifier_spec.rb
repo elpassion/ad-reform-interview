@@ -28,6 +28,34 @@ describe Classifiers::GenderClassifier do
       let(:args) { [height: 100, weight: 80] }
 
       it { expect(subject).to_not raise_error }
+
+      it 'uses NaiveBayesClassifier' do
+        naive_double = double(Classifiers::NaiveBayesClassifier, call: true)
+        allow(Classifiers::NaiveBayesClassifier).to receive(:new).and_return(naive_double)
+        expect(naive_double).to receive(:call)
+        subject.call
+      end
+    end
+  end
+
+  describe '#with_classifier' do
+    subject do
+      described_class.new(height: 100, weight: 80).with_classifier(classifier_name)
+    end
+
+    context 'with invalid classifier' do
+      let(:classifier_name) { :wrong_name }
+
+      it { expect{ subject }.to raise_error(KeyError) }
+    end
+
+    context 'with valid classifier' do
+      let(:classifier_name) { :dummy }
+
+      it 'uses DummyClassifier' do
+        expect(Classifiers::DummyClassifier).to receive(:new)
+        subject
+      end
     end
   end
 end
