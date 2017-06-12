@@ -5,6 +5,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+gem 'nilify_blanks'
 gem 'pg', '~> 0.19.0'
 gem 'slim-rails', '~> 3.1.2'
 
