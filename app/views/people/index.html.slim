@@ -19,7 +19,8 @@ table
         td = link_to 'Show', person
         td = link_to 'Edit', edit_person_path(person)
         td = link_to 'Destroy', person, data: { confirm: 'Are you sure?' }, method: :delete
-
+        - if person.gender_value.unknown?
+          td = link_to 'Calculate gender', calculate_gender_person_path(person)
 br
 
 = link_to 'New Person', new_person_path

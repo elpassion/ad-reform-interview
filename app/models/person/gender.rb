@@ -8,6 +8,8 @@ class Person
       nil => 'Unknown'
     }.freeze; private_constant :VALUE_TO_LABEL
 
+    attr_reader :value
+
     def initialize(value)
       @value = build_value(value)
     end
@@ -16,9 +18,11 @@ class Person
       VALUE_TO_LABEL.fetch(value)
     end
 
-    private
+    def unknown?
+      value.nil?
+    end
 
-    attr_reader :value
+    private
 
     def build_value(value)
       value.present? ? value.to_sym : nil

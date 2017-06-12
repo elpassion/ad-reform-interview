@@ -1,5 +1,5 @@
 class PeopleController < ApplicationController
-  before_action :set_person, only: %i[show edit update destroy]
+  before_action :set_person, only: %i[calculate_gender show edit update destroy]
 
   def index
     @people = Person.all.order(created_at: :desc)

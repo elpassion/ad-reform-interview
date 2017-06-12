@@ -6,6 +6,11 @@ class Person < ApplicationRecord
             inclusion:   { in: Gender::ALLOWED_GENDERS },
             allow_blank: true
 
+  def calculated_gender
+    return gender_value.value unless gender_value.unknown?
+    GenderClassifier.call(self)
+  end
+
   def gender_value
     Gender.new(gender)
   end
