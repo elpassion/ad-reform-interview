@@ -29,7 +29,7 @@ describe Person::PersonImporter do
         expect { subject }.to change { Person.count }.from(0).to(training_data.size)
       end
 
-      include_examples 'should load data with proper attributes' do
+      it_behaves_like 'should load data with proper attributes' do
         let(:collection) do
           subject
           Person.all
@@ -40,7 +40,7 @@ describe Person::PersonImporter do
     describe '.from_csv_to_memory' do
       subject { described_class.from_csv_to_memory(csv_file_path: 'data.csv') }
 
-      include_examples 'should load data with proper attributes' do
+      it_behaves_like 'should load data with proper attributes' do
         let(:collection) { subject.map { |hash| OpenStruct.new(hash) } }
       end
     end

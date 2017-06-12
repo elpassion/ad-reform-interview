@@ -1,22 +1,19 @@
 class Person
   class Gender
-    ALLOWED_VALUES = ['f', 'm', ''].freeze; private_constant :ALLOWED_VALUES
+    ALLOWED_GENDERS = %w[f m].freeze
 
     VALUE_TO_LABEL = {
       m: 'Male',
-      f: 'Female'
+      f: 'Female',
+      nil => 'Unknown'
     }.freeze; private_constant :VALUE_TO_LABEL
 
-    UNKNOWN_LABEL = 'Unknown'.freeze; private_constant :UNKNOWN_LABEL
-
     def initialize(value)
-      raise TypeError unless value.to_s.in? ALLOWED_VALUES
       @value = build_value(value)
     end
 
     def to_s
-      return UNKNOWN_LABEL unless value
-      VALUE_TO_LABEL.fetch(value, UNKNOWN_LABEL)
+      VALUE_TO_LABEL.fetch(value)
     end
 
     private
