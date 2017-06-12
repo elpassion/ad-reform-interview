@@ -33,10 +33,10 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
     subject { described_class.new(*args).call }
 
     before do
-      Person.create([{ age_in_months: 90, height: 95, weight: 102, gender: :m },
-                     { age_in_months: 90, height: 100, weight: 100, gender: :m },
-                     { age_in_months: 90, height: 80, weight: 80, gender: :f },
-                     { age_in_months: 90, height: 70, weight: 60, gender: :f }])
+      Person.create([{ height: 95, weight: 102, gender: :m },
+                     { height: 100, weight: 100, gender: :m },
+                     { height: 80, weight: 80, gender: :f },
+                     { height: 70, weight: 60, gender: :f }])
     end
 
     let(:args) { valid_args }

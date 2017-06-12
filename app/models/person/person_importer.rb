@@ -3,7 +3,6 @@ require 'csv'
 class Person
   class PersonImporter
     class << self
-      CSV_AGE_COLUMN = 'ageMonth'.freeze; private_constant :CSV_AGE_COLUMN
       CSV_GENDER_COLUMN = 'sex'.freeze; private_constant :CSV_GENDER_COLUMN
       CSV_HEIGHT_COLUMN = 'heightIn'.freeze; private_constant :CSV_HEIGHT_COLUMN
       CSV_WEIGHT_COLUMN = 'weightLb'.freeze; private_constant :CSV_WEIGHT_COLUMN
@@ -15,12 +14,12 @@ class Person
         now        = Time.now.to_s(:db)
 
         each_csv_row(csv_file_path: csv_file_path) do |row|
-          age, gender, height, weight = row
-          sql_values << "(#{age}, '#{gender}', #{height}, #{weight}, '#{now}', '#{now}')," # Using #<< for performance
+          gender, height, weight = row
+          sql_values << "('#{gender}', #{height}, #{weight}, '#{now}', '#{now}')," # Using #<< for performance
         end
 
         sql_values  = sql_values.chomp(',')
-        sql_columns = 'age_in_months, gender, height, weight, created_at, updated_at'
+        sql_columns = 'gender, height, weight, created_at, updated_at'
 
         sql = <<-SQL
           INSERT INTO #{Person.table_name} (#{sql_columns}) VALUES #{sql_values}
@@ -34,8 +33,8 @@ class Person
       def from_csv_to_memory(csv_file_path:)
         [].tap do |array|
           each_csv_row(csv_file_path: csv_file_path) do |row|
-            age, gender, height, weight = row
-            array << { age_in_months: age, gender: gender, height: height, weight: weight }
+            gender, height, weight = row
+            array << { gender: gender, height: height, weight: weight }
           end
         end
       end
@@ -50,11 +49,10 @@ class Person
       end
 
       def csv_row_to_array(csv_row)
-        age    = csv_row.fetch(CSV_AGE_COLUMN).to_i
         gender = csv_row.fetch(CSV_GENDER_COLUMN)
         height = csv_row.fetch(CSV_HEIGHT_COLUMN).to_d.round(2)
         weight = csv_row.fetch(CSV_WEIGHT_COLUMN).to_d.round(2)
-        [age, gender, height, weight]
+        [gender, height, weight]
       end
     end
   end
