@@ -50,7 +50,4 @@ module Classifiers
       raise TypeError, "Unknown keys: #{non_allowed_keys}" if non_allowed_keys.any?
     end
   end
-
-  class EngineNotFound < ClassifiersError; end
-  class CouldNotCalculateError < ClassifiersError; end
 end
