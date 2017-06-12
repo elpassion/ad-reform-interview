@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-#TODO: enough tests?
 describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   let(:valid_args) do
     [
@@ -31,6 +30,29 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
   end
 
   describe '#call' do
+    subject { described_class.new(*args).call }
+
+    before do
+      Person.create([{ age_in_months: 90, height: 95, weight: 102, gender: :m },
+                     { age_in_months: 90, height: 100, weight: 100, gender: :m },
+                     { age_in_months: 90, height: 80, weight: 80, gender: :f },
+                     { age_in_months: 90, height: 70, weight: 60, gender: :f }])
+    end
+
+    let(:args) { valid_args }
+
+    it 'returns array of hashes' do
+      expect(subject.size).to eql(2)
+      expect(subject[0].keys).to eql(%i[class likelihood])
+      expect(subject[1].keys).to eql(%i[class likelihood])
+      expect(subject[0][:class]).to eql(:m)
+      expect(subject[1][:class]).to eql(:f)
+      expect(subject[0][:likelihood]).to be_instance_of BigDecimal
+      expect(subject[1][:likelihood]).to be_instance_of BigDecimal
+    end
+  end
+
+  describe 'accuracy' do
     before do
       Person::PersonImporter.from_csv_to_db(
         csv_file_path: Rails.root.join('spec', 'data', 'training_data.csv')
@@ -47,14 +69,14 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
       )
     end
 
-    it 'has accuracy greater than 0.75' do
+    it 'is greater than 0.75' do
       correct_predictions = 0
       test_data.each do |person|
         opts[:observed_data] = person
         results              = described_class.new(opts).call
-        actual_gender        = person.fetch(:gender)
+        actual_gender        = person.fetch(:gender).to_sym
         calculated_gender    = results.first.fetch(:class)
-        correct_predictions += 1 if calculated_gender == actual_gender
+        correct_predictions  += 1 if calculated_gender == actual_gender
       end
       accuracy = correct_predictions / test_data.size.to_f
       expect(accuracy).to be > 0.75

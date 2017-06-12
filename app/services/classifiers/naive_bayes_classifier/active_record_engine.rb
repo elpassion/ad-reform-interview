@@ -13,7 +13,7 @@ module Classifiers
 
       def call
         classes_with_likelihood = classes.map do |klass|
-          { class:      klass,
+          { class:      klass.to_sym,
             likelihood: likelihood_for_class(observed_data, klass) }
         end
 
@@ -40,6 +40,9 @@ module Classifiers
             features.each do |feature|
               feature_average                  = result["#{feature}_mean"].to_d.round(2)
               feature_variance                 = result["#{feature}_var"]
+              if feature_variance.nil?
+                raise CouldNotCalculateError, "variance could not be calculated for the following feature: #{feature}"
+              end
               hash[klass][:means][feature]     = feature_average
               hash[klass][:variances][feature] = feature_variance
             end
@@ -87,6 +90,8 @@ module Classifiers
           "VARIANCE(#{feature}) AS #{feature}_var"
         end.join(',')
       end
+
+      class CouldNotCalculateError < StandardError; end
     end
   end
 end
