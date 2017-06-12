@@ -51,5 +51,6 @@ module Classifiers
     end
   end
 
-  class EngineNotFound < StandardError; end
+  class EngineNotFound < ClassifiersError; end
+  class CouldNotCalculateError < ClassifiersError; end
 end

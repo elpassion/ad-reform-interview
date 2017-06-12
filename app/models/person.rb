@@ -10,8 +10,15 @@ class Person < ApplicationRecord
 
   def calculated_gender
     return gender_value.value unless gender_value.unknown?
-    calculated_gender = GenderClassifier.call(self).first.fetch(:class)
+
+    genders = GenderClassifier.call(self)
+    return Gender(nil) if genders.empty?
+
+    calculated_gender = genders.first.fetch(:class)
     Gender(calculated_gender)
+
+  rescue Classifiers::ClassifiersError => error
+    Gender(nil).tap { |gender| gender.error = error }
   end
 
   def gender_value

@@ -1,5 +1,7 @@
 class Person
   class Gender
+    include ErrorValue
+
     ALLOWED_GENDERS = %w[f m].freeze
 
     VALUE_TO_LABEL = {

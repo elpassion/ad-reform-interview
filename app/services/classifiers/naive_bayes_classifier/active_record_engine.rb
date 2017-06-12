@@ -90,9 +90,6 @@ module Classifiers
           "VARIANCE(#{feature}) AS #{feature}_var"
         end.join(',')
       end
-
-      class CouldNotCalculateError < StandardError
-      end
     end
   end
 end

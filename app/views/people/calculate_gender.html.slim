@@ -1,11 +1,15 @@
-p
-  strong Calculated gender:
-  = @gender
+- if @gender.error?
+  p#error_explanation Could not calculate gender! #{@gender.error}
 
-div
-  - if @gender.female?
-    = image_tag 'wonderwoman.jpg'
-  - elsif @gender.male?
-    = image_tag 'superman.jpg'
+- else
+  p
+    strong Calculated gender:
+    = @gender
+
+  div
+    - if @gender.female?
+      = image_tag 'wonderwoman.jpg'
+    - elsif @gender.male?
+      = image_tag 'superman.jpg'
 
 = link_to 'Back', people_path
