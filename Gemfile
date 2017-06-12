@@ -50,5 +50,11 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
+group :test do
+  gem 'capybara', '~> 2.14.0' # Using Capybara since system tests are not supported by RSpec yet
+  gem 'capybara-screenshot', '~> 1.0.14'
+  gem 'poltergeist', '~> 1.15.0'
+end
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
