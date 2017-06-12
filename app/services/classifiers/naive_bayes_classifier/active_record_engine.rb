@@ -7,7 +7,7 @@ module Classifiers
       def initialize(ar_scope:, class_column:, features:, observed_data:)
         @class_column  = class_column
         @features      = features
-        @ar_scope      = ar_scope
+        @ar_scope      = ar_scope.where.not(class_column => nil)
         @observed_data = observed_data
       end
 
