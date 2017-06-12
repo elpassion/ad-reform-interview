@@ -1,11 +1,15 @@
 module Classifiers
   class NaiveBayesClassifier
-    #TODO: add pure ruby engine
     require_relative 'naive_bayes_classifier/active_record_engine'
+    require_relative 'naive_bayes_classifier/ruby_engine'
     private_constant :ActiveRecordEngine
+    private_constant :RubyEngine
 
     ACTIVE_RECORD_ENGINE_OPTIONS = %i[ar_scope class_column features].freeze
     private_constant :ACTIVE_RECORD_ENGINE_OPTIONS
+
+    RUBY_ENGINE_OPTIONS = %i[collection class_name features].freeze
+    private_constant :RUBY_ENGINE_OPTIONS
 
     REQUIRED_OPTIONS = %i[observed_data].freeze
     private_constant :REQUIRED_OPTIONS
@@ -30,6 +34,8 @@ module Classifiers
       keys = opts.keys
       if (ACTIVE_RECORD_ENGINE_OPTIONS - keys).empty?
         ActiveRecordEngine.new(opts)
+      elsif (RUBY_ENGINE_OPTIONS - keys).empty?
+        RubyEngine.new(opts)
       else
         raise EngineNotFound,
               "Could not find engine for following options: #{keys}"
