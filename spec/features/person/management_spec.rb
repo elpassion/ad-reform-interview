@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe 'Person management', type: :feature, js: true do
-  it do
+  scenario do
     visit new_person_path
 
     # Try to create Person with no attributes
@@ -17,7 +17,7 @@ describe 'Person management', type: :feature, js: true do
     end
 
     # Create Person
-    fill_in 'Gender', with: 'f'
+    select 'Female', from: 'Gender'
     fill_in 'Height', with: '5.5'
     fill_in 'Weight', with: '66'
     click_button 'Create Person'
@@ -28,7 +28,7 @@ describe 'Person management', type: :feature, js: true do
 
     # Remove gender
     click_link 'Edit'
-    fill_in 'Gender', with: nil
+    select 'Unknown', from: 'Gender'
     click_button 'Update Person'
     expect(page).to have_content 'Person was successfully updated.'
     expect(page).to have_content 'Gender:Unknown'

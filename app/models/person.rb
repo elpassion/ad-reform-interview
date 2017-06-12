@@ -10,10 +10,11 @@ class Person < ApplicationRecord
 
   def calculated_gender
     return gender_value.value unless gender_value.unknown?
-    GenderClassifier.call(self)
+    calculated_gender = GenderClassifier.call(self).first.fetch(:class)
+    Gender(calculated_gender)
   end
 
   def gender_value
-    Gender.new(gender)
+    Gender(gender)
   end
 end

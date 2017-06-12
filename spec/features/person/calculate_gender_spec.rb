@@ -12,12 +12,12 @@ describe 'Person management', type: :feature, js: true do
 
     # Create Person
     click_link 'New Person'
-    fill_in 'Gender', with: nil
+    select 'Unknown', from: 'Gender'
     fill_in 'Height', with: '6'
     fill_in 'Weight', with: '130'
     click_button 'Create Person'
     visit people_path
-    save_and_open_page
-
+    click_link 'Calculate gender'
+    expect(page).to have_content 'Calculated gender:Female'
   end
 end

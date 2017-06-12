@@ -28,4 +28,8 @@ class Person
       value.present? ? value.to_sym : nil
     end
   end
+
+  def Gender(gender)
+    Gender.new(gender)
+  end
 end
