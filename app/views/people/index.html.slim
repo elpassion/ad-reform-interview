@@ -3,6 +3,7 @@ h1 Listing people
 table
   thead
     tr
+      th Gender
       th Height
       th Weight
       th
@@ -12,6 +13,7 @@ table
   tbody
     - @people.each do |person|
       tr
+        td = person.gender_value
         td = person.height
         td = person.weight
         td = link_to 'Show', person
