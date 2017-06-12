@@ -6,6 +6,7 @@ git_source(:github) do |repo_name|
 end
 
 gem 'pg', '~> 0.19.0'
+gem 'slim-rails', '~> 3.1.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.1'
