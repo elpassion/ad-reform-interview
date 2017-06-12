@@ -9,7 +9,7 @@ describe Person::PersonImporter do
        { 'ageMonth' => 234, 'sex' => 'm', 'heightIn' => 60.8, 'weightLb' => 85.2 }]
     end
 
-    shared_examples_for 'loads data with proper attributes' do
+    shared_examples_for 'should load data with proper attributes' do
       it do
         first_person = collection.first
         last_person  = collection.last
@@ -27,11 +27,11 @@ describe Person::PersonImporter do
     describe '.from_csv_to_db' do
       subject { described_class.from_csv_to_db(csv_file_path: 'data.csv') }
 
-      it 'loads data from csv to database' do
+      it 'should load data from csv to database' do
         expect { subject }.to change { Person.count }.from(0).to(training_data.size)
       end
 
-      include_examples 'loads data with proper attributes' do
+      include_examples 'should load data with proper attributes' do
         let(:collection) do
           subject
           Person.all
@@ -42,7 +42,7 @@ describe Person::PersonImporter do
     describe '.from_csv_to_memory' do
       subject { described_class.from_csv_to_memory(csv_file_path: 'data.csv') }
 
-      include_examples 'loads data with proper attributes' do
+      include_examples 'should load data with proper attributes' do
         let(:collection) { subject.map { |hash| OpenStruct.new(hash) } }
       end
     end

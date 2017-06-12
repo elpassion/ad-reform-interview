@@ -41,7 +41,7 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
 
     let(:args) { valid_args }
 
-    it 'returns array of hashes' do
+    it 'should return array of hashes' do
       expect(subject.size).to eql(2)
       expect(subject[0].keys).to eql(%i[class likelihood])
       expect(subject[1].keys).to eql(%i[class likelihood])
@@ -69,7 +69,7 @@ describe Classifiers::NaiveBayesClassifier.const_get(:ActiveRecordEngine) do
       )
     end
 
-    it 'is greater than 0.75' do
+    it 'should be greater than 0.75' do
       correct_predictions = 0
       test_data.each do |person|
         opts[:observed_data] = person

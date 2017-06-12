@@ -9,7 +9,7 @@ describe Person::GenderClassifier do
 
       it { expect(subject).to_not raise_error }
 
-      it 'uses NaiveBayesClassifier' do
+      it 'should use NaiveBayesClassifier' do
         naive_double = double(Classifiers::NaiveBayesClassifier, call: true)
         allow(Classifiers::NaiveBayesClassifier).to receive(:new).with(
           ar_scope:      Person,
@@ -36,7 +36,7 @@ describe Person::GenderClassifier do
     context 'with valid classifier' do
       let(:classifier_name) { :dummy }
 
-      it 'uses given classifier' do
+      it 'should use given classifier' do
         expect(Classifiers::DummyClassifier).to receive(:new)
         subject
       end
